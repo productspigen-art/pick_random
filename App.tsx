@@ -167,7 +167,7 @@ function App() {
     const displayCount = Math.max(6, names.length);
 
     return (
-        <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center p-4 font-sans antialiased">
+        <div className="relative min-h-screen bg-slate-900 flex flex-col items-center justify-center p-4 font-sans antialiased">
             <div className="w-full max-w-2xl mx-auto">
                 <header className="text-center mb-8">
                     <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-yellow-400 to-rose-500 text-transparent bg-clip-text mb-2">
@@ -290,6 +290,9 @@ function App() {
                     </div>
                 </div>
             )}
+            <footer className="absolute bottom-4 text-center text-slate-500 text-xs">
+                <p>제작: JH Tech | 누가 사지? 운명에 맡겨 보세요!</p>
+            </footer>
         </div>
     );
 }
