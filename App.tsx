@@ -167,30 +167,30 @@ function App() {
     const displayCount = Math.max(6, names.length);
 
     return (
-        <div className="relative min-h-screen bg-slate-900 flex flex-col items-center justify-center p-4 font-sans antialiased">
-            <div className="w-full max-w-2xl mx-auto">
-                <header className="text-center mb-8">
-                    <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-yellow-400 to-rose-500 text-transparent bg-clip-text mb-2">
+        <div className="relative min-h-screen bg-slate-900 flex flex-col items-center justify-center p-2 sm:p-4 font-sans antialiased">
+            <div className="w-full max-w-2xl mx-auto pb-12">
+                <header className="text-center mb-6 sm:mb-8">
+                    <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-yellow-400 to-rose-500 text-transparent bg-clip-text mb-2">
                         걸려 걸려 걸림판
                     </h1>
-                    <p className="text-slate-400 text-lg">커피값, 밥값 내기! 운명의 주인공은?</p>
-                    <p className="text-slate-500 text-sm mt-1">만약 특별한 문구가 보인다면 기분탓입니다.</p>
+                    <p className="text-slate-400 text-md sm:text-lg">커피값, 밥값 내기! 운명의 주인공은?</p>
+                    <p className="text-slate-500 text-xs sm:text-sm mt-1">만약 특별한 문구가 보인다면 기분탓입니다.</p>
                 </header>
 
                 <main>
-                    <div className="bg-slate-800/50 backdrop-blur-sm p-6 rounded-xl shadow-2xl mb-8 border border-slate-700">
+                    <div className="bg-slate-800/50 backdrop-blur-sm p-4 sm:p-6 rounded-xl shadow-2xl mb-6 sm:mb-8 border border-slate-700">
                         <form onSubmit={handleAddNames} className="flex flex-col sm:flex-row gap-3">
                             <input
                                 type="text"
                                 value={inputValue}
                                 onChange={(e) => setInputValue(e.target.value)}
-                                placeholder="이름을 쉼표, 공백으로 구분하여 입력 (예: 홍길동, 이순신)"
+                                placeholder="이름 입력 (쉼표/공백으로 구분)"
                                 className="flex-grow bg-slate-700 text-white placeholder-slate-400 px-4 py-3 rounded-lg border-2 border-slate-600 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/50 outline-none transition-all"
                                 disabled={isSpinning}
                             />
                             <button
                                 type="submit"
-                                className="bg-yellow-500 hover:bg-yellow-600 text-slate-900 font-bold px-6 py-3 rounded-lg transition-colors disabled:bg-slate-600 disabled:cursor-not-allowed"
+                                className="w-full sm:w-auto bg-yellow-500 hover:bg-yellow-600 text-slate-900 font-bold px-6 py-3 rounded-lg transition-colors disabled:bg-slate-600 disabled:cursor-not-allowed"
                                 disabled={isSpinning || !inputValue.trim()}
                             >
                                 추가하기
@@ -200,7 +200,7 @@ function App() {
                     
                     {errorMessage && <p className="text-red-400 text-center mb-4 animate-pulse">{errorMessage}</p>}
 
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-8 min-h-[100px]">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 mb-8 min-h-[100px]">
                        {Array.from({ length: displayCount }).map((_, index) => {
                             const nameEntry = names[index];
                             const hasName = nameEntry !== undefined;
@@ -208,7 +208,7 @@ function App() {
                             return hasName ? (
                                 <div
                                     key={index}
-                                    className={`relative flex flex-col items-center justify-center p-4 h-24 rounded-lg shadow-lg text-center break-words transition-all duration-200 ease-in-out
+                                    className={`relative flex flex-col items-center justify-center p-2 sm:p-4 h-24 rounded-lg shadow-lg text-center break-words transition-all duration-200 ease-in-out
                                     ${
                                         winnerIndex === index
                                             ? 'bg-rose-600 text-white scale-110 shadow-rose-500/50 animate-pulse z-20 border-2 border-rose-400'
@@ -219,7 +219,7 @@ function App() {
                                     ${nameEntry.effect ? nameEntry.effect.auraClass : ''}
                                     `}
                                 >
-                                    <span className="font-bold text-xl">{nameEntry.name}</span>
+                                    <span className="font-bold text-lg sm:text-xl">{nameEntry.name}</span>
                                     {nameEntry.effect && (
                                         <small className="mt-1 text-xs opacity-90 font-medium animate-pulse">{nameEntry.effect.text}</small>
                                     )}
@@ -227,7 +227,7 @@ function App() {
                                     {!isSpinning && (
                                          <button 
                                              onClick={() => removeName(index)}
-                                             className="absolute top-1 right-1 bg-slate-800/50 text-white/70 hover:bg-red-500/80 hover:text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-mono transition-colors"
+                                             className="absolute top-1.5 right-1.5 bg-slate-800/50 text-white/70 hover:bg-red-500/80 hover:text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-mono transition-colors"
                                              aria-label={`${nameEntry.name} 제거`}
                                          >
                                              X
@@ -245,11 +245,11 @@ function App() {
                        })}
                     </div>
 
-                    <div className="flex justify-center items-center gap-4">
+                    <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
                         <button
                             onClick={handleSpin}
                             disabled={isSpinning || names.length < 2}
-                            className="flex items-center justify-center gap-2 w-48 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold text-xl px-8 py-4 rounded-full shadow-lg transform hover:scale-105 transition-all duration-300 disabled:from-slate-600 disabled:to-slate-700 disabled:cursor-not-allowed disabled:scale-100 disabled:shadow-none"
+                            className="w-full sm:w-48 flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold text-xl px-8 py-4 rounded-full shadow-lg transform hover:scale-105 transition-all duration-300 disabled:from-slate-600 disabled:to-slate-700 disabled:cursor-not-allowed disabled:scale-100 disabled:shadow-none"
                         >
                             <PlayIcon />
                             돌리기!
@@ -257,7 +257,7 @@ function App() {
                         <button
                             onClick={handleReset}
                             disabled={isSpinning}
-                            className="flex items-center justify-center gap-2 bg-slate-700 hover:bg-slate-600 text-slate-300 font-semibold px-6 py-4 rounded-full shadow-md transform hover:scale-105 transition-all duration-300 disabled:bg-slate-800 disabled:cursor-not-allowed disabled:scale-100 disabled:shadow-none"
+                            className="w-full sm:w-auto flex items-center justify-center gap-2 bg-slate-700 hover:bg-slate-600 text-slate-300 font-semibold px-6 py-4 rounded-full shadow-md transform hover:scale-105 transition-all duration-300 disabled:bg-slate-800 disabled:cursor-not-allowed disabled:scale-100 disabled:shadow-none"
                         >
                             <ResetIcon />
                             초기화
@@ -267,11 +267,11 @@ function App() {
             </div>
             {showWinnerModal && winnerIndex !== null && (
                 <div 
-                    className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in"
+                    className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in p-4"
                     onClick={() => setShowWinnerModal(false)}
                 >
                     <div 
-                        className="relative bg-slate-800 border-2 border-yellow-400 rounded-2xl shadow-2xl p-8 max-w-md w-full text-center transform animate-scale-up overflow-hidden"
+                        className="relative bg-slate-800 border-2 border-yellow-400 rounded-2xl shadow-2xl p-6 sm:p-8 max-w-md w-full text-center transform animate-scale-up overflow-hidden"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <Confetti />
@@ -290,7 +290,7 @@ function App() {
                     </div>
                 </div>
             )}
-            <footer className="absolute bottom-4 text-center text-slate-500 text-xs">
+            <footer className="absolute bottom-4 text-center text-slate-500 text-xs px-2">
                 <p>제작: JH Tech | 누가 사지? 운명에 맡겨 보세요!</p>
             </footer>
         </div>
