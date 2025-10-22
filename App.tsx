@@ -167,9 +167,9 @@ function App() {
     const displayCount = Math.max(6, names.length);
 
     return (
-        <div className="relative min-h-screen bg-slate-900 flex flex-col items-center justify-center p-2 sm:p-4 font-sans antialiased">
+        <div className="relative min-h-screen bg-slate-900 flex flex-col items-center justify-center p-2 font-sans antialiased">
             <div className="w-full max-w-2xl mx-auto pb-12">
-                <header className="text-center mb-6 sm:mb-8">
+                <header className="text-center mb-4 sm:mb-6">
                     <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-yellow-400 to-rose-500 text-transparent bg-clip-text mb-2">
                         걸려 걸려 걸림판
                     </h1>
@@ -178,7 +178,7 @@ function App() {
                 </header>
 
                 <main>
-                    <div className="bg-slate-800/50 backdrop-blur-sm p-4 sm:p-6 rounded-xl shadow-2xl mb-6 sm:mb-8 border border-slate-700">
+                    <div className="bg-slate-800/50 backdrop-blur-sm p-4 sm:p-6 rounded-xl shadow-2xl mb-4 sm:mb-6 border border-slate-700">
                         <form onSubmit={handleAddNames} className="flex flex-col sm:flex-row gap-3">
                             <input
                                 type="text"
@@ -200,7 +200,7 @@ function App() {
                     
                     {errorMessage && <p className="text-red-400 text-center mb-4 animate-pulse">{errorMessage}</p>}
 
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 mb-8 min-h-[100px]">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 mb-6 min-h-[100px]">
                        {Array.from({ length: displayCount }).map((_, index) => {
                             const nameEntry = names[index];
                             const hasName = nameEntry !== undefined;
@@ -208,7 +208,7 @@ function App() {
                             return hasName ? (
                                 <div
                                     key={index}
-                                    className={`relative flex flex-col items-center justify-center p-2 sm:p-4 h-24 rounded-lg shadow-lg text-center break-words transition-all duration-200 ease-in-out
+                                    className={`relative flex flex-col items-center justify-center p-2 sm:p-3 h-20 rounded-lg shadow-lg text-center break-words transition-all duration-200 ease-in-out
                                     ${
                                         winnerIndex === index
                                             ? 'bg-rose-600 text-white scale-110 shadow-rose-500/50 animate-pulse z-20 border-2 border-rose-400'
@@ -237,7 +237,7 @@ function App() {
                             ) : (
                                 <div
                                     key={index}
-                                    className="flex items-center justify-center p-4 h-24 rounded-lg text-center font-bold text-3xl text-slate-600 border-2 border-dashed border-slate-700 bg-slate-800/50"
+                                    className="flex items-center justify-center p-3 h-20 rounded-lg text-center font-bold text-3xl text-slate-600 border-2 border-dashed border-slate-700 bg-slate-800/50"
                                 >
                                     <span>+</span>
                                 </div>
