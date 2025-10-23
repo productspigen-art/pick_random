@@ -1,4 +1,5 @@
-import React, { useState, useCallback } from 'react';
+
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 
 // Icons defined as components outside the main App to prevent re-creation on render
 const PlayIcon: React.FC = () => (
@@ -16,7 +17,7 @@ const ResetIcon: React.FC = () => (
     </svg>
 );
 
-// --- New Feature: Effects ---
+// --- Feature: Effects ---
 interface Effect {
     text: string;
     auraClass: string;
@@ -34,7 +35,10 @@ const effects: Effect[] = [
     { text: '안전지대?', auraClass: 'shadow-blue-300/50 shadow-[0_0_20px_theme(colors.blue.300)]' },
     { text: '헉!', auraClass: 'shadow-red-500/50 shadow-[0_0_20px_theme(colors.red.500)]' },
 ];
-// --- End New Feature ---
+
+// --- New Feature: Quick Start ---
+const quickStartOptions = [2, 3, 4, 5, 6, 8] as const;
+
 
 const Confetti: React.FC = () => {
     const confettiCount = 100;
@@ -68,6 +72,9 @@ function App() {
     const [winnerIndex, setWinnerIndex] = useState<number | null>(null);
     const [errorMessage, setErrorMessage] = useState<string>('');
     const [showWinnerModal, setShowWinnerModal] = useState<boolean>(false);
+    const [copyButtonText, setCopyButtonText] = useState<string>('결과 복사');
+    const [editingIndex, setEditingIndex] = useState<number | null>(null);
+    const [editingValue, setEditingValue] = useState<string>('');
 
     const handleAddNames = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -95,6 +102,23 @@ function App() {
             setErrorMessage('');
         }
     };
+
+    const handleQuickStart = (count: number) => {
+        if (isSpinning) return;
+        const newNameEntries: NameEntry[] = Array.from({ length: count }, (_, i) => {
+            const name = String(i + 1);
+            // 10% chance to add an effect
+            if (Math.random() < 0.1) {
+                const randomEffect = effects[Math.floor(Math.random() * effects.length)];
+                return { name, effect: randomEffect };
+            }
+            return { name };
+        });
+        setNames(newNameEntries);
+        setWinnerIndex(null);
+        setShowWinnerModal(false);
+        setErrorMessage('');
+    };
     
     const handleSpin = useCallback(() => {
         if (names.length < 2) {
@@ -103,6 +127,7 @@ function App() {
         }
         if (isSpinning) return;
 
+        setEditingIndex(null); // Stop editing if spin starts
         setIsSpinning(true);
         setWinnerIndex(null);
         setShowWinnerModal(false);
@@ -153,6 +178,7 @@ function App() {
         setWinnerIndex(null);
         setErrorMessage('');
         setShowWinnerModal(false);
+        setEditingIndex(null);
     };
     
     const removeName = (indexToRemove: number) => {
@@ -162,6 +188,58 @@ function App() {
             setWinnerIndex(null);
         }
         setShowWinnerModal(false);
+    };
+
+    const handleCopyResult = () => {
+        if (winnerIndex !== null) {
+            const winnerName = names[winnerIndex].name;
+            const textToCopy = `🎉 당첨: ${winnerName} 🎉\n\n걸림판 직접 돌리기: https://pick-random-hhpw.vercel.app/`;
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                setCopyButtonText('복사 완료!');
+                setTimeout(() => {
+                    setCopyButtonText('결과 복사');
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+                setCopyButtonText('복사 실패');
+                 setTimeout(() => {
+                    setCopyButtonText('결과 복사');
+                }, 2000);
+            });
+        }
+    };
+    
+    const closeWinnerModal = () => {
+        setShowWinnerModal(false);
+        setCopyButtonText('결과 복사');
+    };
+
+    const startEditing = (index: number) => {
+        if (isSpinning) return;
+        setEditingIndex(index);
+        setEditingValue(names[index].name);
+    };
+
+    const handleNameUpdate = (index: number) => {
+        const trimmedValue = editingValue.trim();
+        if (trimmedValue === '') {
+            removeName(index);
+        } else {
+            const updatedNames = [...names];
+            updatedNames[index] = { ...updatedNames[index], name: trimmedValue };
+            setNames(updatedNames);
+        }
+        setEditingIndex(null);
+        setEditingValue('');
+    };
+
+    const handleEditKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
+        if (e.key === 'Enter') {
+            handleNameUpdate(index);
+        } else if (e.key === 'Escape') {
+            setEditingIndex(null);
+            setEditingValue('');
+        }
     };
     
     const displayCount = Math.max(6, names.length);
@@ -198,6 +276,22 @@ function App() {
                         </form>
                     </div>
                     
+                    <div className="mb-4 sm:mb-6 px-1">
+                        <p className="text-slate-400 text-sm mb-3 text-center sm:text-left">👇 빠른진행</p>
+                        <div className="flex flex-wrap justify-center sm:justify-start gap-2">
+                            {quickStartOptions.map((count) => (
+                                <button
+                                    key={count}
+                                    onClick={() => handleQuickStart(count)}
+                                    disabled={isSpinning}
+                                    className="px-4 py-1.5 bg-slate-700 text-slate-300 rounded-full text-sm font-medium hover:bg-slate-600 transition-colors disabled:bg-slate-800 disabled:cursor-not-allowed disabled:text-slate-500"
+                                >
+                                    {count}명
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
                     {errorMessage && <p className="text-red-400 text-center mb-4 animate-pulse">{errorMessage}</p>}
 
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 mb-6 min-h-[100px]">
@@ -208,7 +302,9 @@ function App() {
                             return hasName ? (
                                 <div
                                     key={index}
-                                    className={`relative flex flex-col items-center justify-center p-2 sm:p-3 h-20 rounded-lg shadow-lg text-center break-words transition-all duration-200 ease-in-out
+                                    onDoubleClick={() => startEditing(index)}
+                                    title={!isSpinning ? '더블클릭하여 수정' : ''}
+                                    className={`relative flex flex-col items-center justify-center p-2 sm:p-3 h-20 rounded-lg shadow-lg text-center break-words transition-all duration-200 ease-in-out cursor-pointer
                                     ${
                                         winnerIndex === index
                                             ? 'bg-rose-600 text-white scale-110 shadow-rose-500/50 animate-pulse z-20 border-2 border-rose-400'
@@ -219,8 +315,21 @@ function App() {
                                     ${nameEntry.effect ? nameEntry.effect.auraClass : ''}
                                     `}
                                 >
-                                    <span className="font-bold text-lg sm:text-xl">{nameEntry.name}</span>
-                                    {nameEntry.effect && (
+                                    {editingIndex === index ? (
+                                        <input
+                                            type="text"
+                                            value={editingValue}
+                                            onChange={(e) => setEditingValue(e.target.value)}
+                                            onBlur={() => handleNameUpdate(index)}
+                                            onKeyDown={(e) => handleEditKeyDown(e, index)}
+                                            className="w-full bg-slate-600 text-center text-white font-bold text-lg sm:text-xl rounded outline-none p-1 ring-2 ring-yellow-400"
+                                            autoFocus
+                                        />
+                                    ) : (
+                                        <span className="font-bold text-lg sm:text-xl px-1">{nameEntry.name}</span>
+                                    )}
+
+                                    {nameEntry.effect && editingIndex !== index && (
                                         <small className="mt-1 text-xs opacity-90 font-medium animate-pulse">{nameEntry.effect.text}</small>
                                     )}
 
@@ -268,7 +377,7 @@ function App() {
             {showWinnerModal && winnerIndex !== null && (
                 <div 
                     className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in p-4"
-                    onClick={() => setShowWinnerModal(false)}
+                    onClick={closeWinnerModal}
                 >
                     <div 
                         className="relative bg-slate-800 border-2 border-yellow-400 rounded-2xl shadow-2xl p-6 sm:p-8 max-w-md w-full text-center transform animate-scale-up overflow-hidden"
@@ -281,12 +390,20 @@ function App() {
                             {names[winnerIndex].name}
                         </p>
                         <p className="text-slate-400 mt-4">오늘의 주인공은 바로 당신!</p>
-                        <button
-                            onClick={() => setShowWinnerModal(false)}
-                            className="mt-8 bg-yellow-500 hover:bg-yellow-600 text-slate-900 font-bold px-8 py-3 rounded-lg transition-colors"
-                        >
-                            확인
-                        </button>
+                        <div className="mt-8 flex flex-col sm:flex-row justify-center gap-3 w-full">
+                            <button
+                                onClick={closeWinnerModal}
+                                className="w-full sm:flex-grow bg-yellow-500 hover:bg-yellow-600 text-slate-900 font-bold px-6 py-3 rounded-lg transition-colors"
+                            >
+                                확인
+                            </button>
+                            <button
+                                onClick={handleCopyResult}
+                                className="w-full sm:flex-grow bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold px-6 py-3 rounded-lg transition-colors"
+                            >
+                                {copyButtonText}
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
